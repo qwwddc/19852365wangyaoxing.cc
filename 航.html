@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>耀星航空 | YAOXING AIR</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;background:#f4f6f8;color:#1a1a1a;overflow:hidden}
+:root{
+  --main:#002147;
+  --main-2:#003366;
+  --accent:#d4af37;
+  --line:#e6e8eb;
+  --text:#1a1a1a;
+  --text-2:#5b6470;
+  --text-3:#8a93a0;
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --danger:#c0392b;
+  --success:#1f7a4c;
+  --warning:#b56b12;
+  --seat-free:#fff;
+  --seat-selected:#002147;
+  --seat-sold:#c8c9cc;
+  --seat-lock:#e2e4e8;
+}
+.splash{
+  position:fixed;inset:0;background:linear-gradient(160deg,#002147 0%,#003366 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;
+  transition:opacity .35s ease;
+}
+.splash.hide{opacity:0;pointer-events:none}
+.splash-logo{
+  width:96px;height:96px;border-radius:24px;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+  border:1px solid rgba(212,175,55,.25);
+}
+.splash h1{color:#fff;font-size:26px;letter-spacing:4px}
+.splash p{color:rgba(255,255,255,.7);font-size:12px;letter-spacing:6px;margin-top:6px}
+.splash .bar{width:120px;height:3px;background:rgba(255,255,255,.12);border-radius:2px;margin-top:22px;overflow:hidden}
+.splash .bar i{display:block;width:40%;height:100%;background:var(--accent);animation:loading 0.35s infinite}
+@keyframes loading{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+
+.guide-wrap{position:fixed;inset:0;background:#fff;z-index:9990;display:none}
+.guide-wrap.show{display:block}
+.guide{width:300vw;height:100%;display:flex;transition:transform .4s ease}
+.guide-page{width:100vw;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.guide-page i{font-size:72px;color:var(--main);margin-bottom:20px}
+.guide-page h3{font-size:22px;color:var(--main);margin-bottom:12px}
+.guide-page p{color:var(--text-2);line-height:1.7;font-size:14px}
+.guide-dots{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);display:flex;gap:8px}
+.guide-dots span{width:8px;height:8px;border-radius:50%;background:#ccc}
+.guide-dots span.active{background:var(--main)}
+.guide-btn{position:absolute;bottom:40px;left:50%;transform: translate(-50%);padding:12px 32px;border-radius:99px;background:var(--main);color:#fff;border:none;font-size:16px;display:none}
+.guide-btn.show{display:block}
+.guide-skip{position:absolute;top:24px;right:24px;color:var(--text-2);font-size:14px}
+
+.app{display:none;height:100%;flex-direction:column;background:var(--bg)}
+.app.show{display:flex}
+.topbar{
+  height:44px;background:var(--main);color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;font-size:13px;flex-shrink:0;
+}
+.topbar .brand{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:2px}
+.topbar .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.topbar .right{display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.85)}
+.header{
+  background:var(--main);color:#fff;padding:10px 14px 14px;flex-shrink:0;display:none;
+}
+.header-row{display:flex;align-items:center;justify-content:space-between}
+.back-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px 8px}
+.header-title{font-size:16px;font-weight:600;letter-spacing:1px}
+.header-placeholder{width:40px}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:72px}
+.tabbar{
+  position:absolute;left:0;right:0;bottom:0;height:60px;background:#fff;border-top:1px solid var(--line);
+  display:none;z-index:50;
+}
+.tabbar.show{display:flex}
+.tabbar .tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--text-2);font-size:11px;cursor:pointer;border:none;background:none;
+}
+.tabbar .tab i{font-size:18px}
+.tabbar .tab.active{color:var(--main)}
+.page{display:none}
+.page.active{display:block}
+.card{background:var(--card);border-radius:14px;margin:12px;padding:14px;border:1px solid var(--line)}
+.section-title{font-size:14px;color:var(--text-2);margin:14px 14px 8px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center}
+.muted{color:var(--text-2);font-size:13px}
+.small{font-size:12px;color:var(--text-3)}
+.home-banner{
+  height:200px;border-radius:18px;margin:12px;
+  background:linear-gradient(135deg,#002147 0%,#003366 40%,#0052aa 100%);
+  color:#fff;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:20px;
+}
+.home-banner h2{font-size:26px;letter-spacing:2px;margin-bottom:8px}
+.home-banner p{font-size:14px;color:rgba(255,255,255,.85);margin-bottom:12px}
+.home-banner button{
+  width:auto;align-self:flex-start;padding:10px 24px;border-radius:99px;border:none;background:var(--accent);color:#002147;font-weight:700;font-size:14px;cursor:pointer
+}
+
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px}
+.quick-item{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 4px;
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;
+}
+.quick-item i{font-size:24px;color:var(--main);margin-bottom:6px}
+.quick-item span{font-size:12px;color:var(--text)}
+
+.flight-tab{display:flex;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:10}
+.flight-tab button{flex:1;padding:14px;border:none;background:transparent;font-size:15px;cursor:pointer;position:relative}
+.flight-tab button.active{color:var(--main);font-weight:bold}
+.flight-tab button.active::after{
+  content:"";position:absolute;bottom:0;left:25%;width:50%;height:3px;background:var(--main);border-radius:3px
+}
+.city-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+  padding:12px;
+}
+.city-card{
+  height:110px;
+  border-radius:12px;
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  background:linear-gradient(135deg,#cfd8e3,#9db3c8);
+  border:1px solid var(--line);
+}
+.city-card .name{
+  position:absolute;bottom:0;left:0;right:0;
+  text-align:center;color:#fff;font-size:14px;padding:6px 0;
+  background:linear-gradient(transparent,rgba(0,0,0,0.45));
+}
+.city-card.selected{outline:3px solid var(--accent);outline-offset:2px;}
+
+.select-city-row{
+  display:grid;
+  grid-template-columns: 1fr 40px 1fr;
+  gap:8px;
+  padding:12px;
+  align-items:center;
+}
+.select-city-row button{
+  height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer
+}
+.swap-city{
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center
+}
+.city-select-box{
+  padding:12px;
+}
+.city-select-box h4{margin-bottom:8px;color:var(--text-2)}
+
+.query-btn-wrap{padding:0 12px 10px;}
+#doSearchFlight{width:100%;padding:12px;border-radius:12px;background:var(--main);color:#fff;border:none;font-size:15px;cursor:pointer}
+
+.date-box{padding:0 12px}
+.date-box input{width:100%;margin-top:4px;padding:12px;border-radius:12px;border:1px solid var(--line);font-size:14px}
+.search-tip{padding:0 14px;color:var(--text-3);font-size:13px;margin:6px 0}
+
+.flight-list{padding:8px 12px 20px}
+.flight-row-item{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:10px;
+  border:1px solid var(--line);
+  display:grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap:10px;
+  align-items:center;
+  cursor:pointer;
+  position:relative;
+}
+.flight-left,.flight-right{display:flex;flex-direction:column;gap:4px}
+.flight-right{align-items:flex-end}
+.flight-airline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.flight-logo{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--main);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:bold
+}
+.plane-tag{
+  display:inline-block;padding:2px 8px;border-radius:99px;background:#eef4fb;color:var(--main);font-size:11px;margin-left:6px;border:1px solid #dce7f4
+}
+.plane-tag.gulfstream{background:#fdf4e1;color:#b56b12;border:1px solid #f1e0b4}
+.flight-time{font-size:20px;font-weight:bold;color:var(--text)}
+.flight-city{font-size:13px;color:var(--text-2)}
+.flight-middle{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--text-2);font-size:12px
+}
+.flight-duration{font-weight:bold;color:var(--main)}
+.flight-line{
+  width:80px;height:1px;background:var(--line);position:relative;
+}
+.flight-line::before{
+  content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;
+  background:var(--main)
+}
+.flight-line::after{
+  content:"";position:absolute;right:-4px;top:-3px;width:8px;height:8px;border-radius:50%;
+  background:var(--main)
+}
+.flight-plane{font-size:12px;color:var(--text-3)}
+.flight-price-area{
+  position:absolute;right:14px;bottom:10px;
+  font-size:13px;color:var(--danger);font-weight:bold
+}
+
+/* 弹窗 */
+.mask{
+  position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9980;display:none;align-items:center;justify-content:center;
+  padding:10px;
+}
+.mask.show{display:flex}
+.modal{
+  width:100%;max-height:90vh;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid var(--line)}
+.modal-head h3{font-size:16px}
+.modal-close{border:none;background:none;font-size:20px;cursor:pointer}
+.modal-body{flex:1;overflow:auto;padding:14px}
+.modal-footer{padding:14px;border-top:1px solid var(--line);display:flex;gap:10px}
+.modal-footer button{flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:15px}
+.modal-footer .next{background:var(--main);color:white}
+.modal-footer .cancel{background:#f1f2f4;color:#1a1a1a}
+
+/* 座位图 */
+.seat-wrap{text-align:center;margin-top:10px}
+.seat-title{margin-bottom:10px;color:var(--text-2);font-size:14px}
+.seat-plane{
+  display:inline-block;
+  background:#fff;
+  border:2px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  max-width:420px;
+  width:100%;
+}
+.seat-row{display:flex;align-items:center;justify-content:center;gap:4px;margin:4px 0}
+.seat{
+  width:28px;height:30px;border-radius:6px;border:1px solid #ddd;
+  font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--seat-free);
+}
+.seat.selected{background:var(--seat-selected);color:white;border-color:var(--main)}
+.seat.sold{background:var(--seat-sold);cursor:not-allowed;color:#777}
+.seat.locked{background:var(--seat-lock);cursor:not-allowed;color:#999}
+.aisle{width:22px}
+.seat-block{margin:14px 0}
+.double-deck{border:2px solid #999;border-radius:14px;padding:14px}
+.deck-label{text-align:center;background:var(--main);color:white;padding:6px;border-radius:8px;margin-bottom:10px;font-size:14px}
+.row-number{display:inline-block;width:24px;font-size:11px;color:var(--text-3);text-align:center}
+
+.cabin-select-group{margin:10px 0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cabin-select-group button{padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
+.cabin-select-group button.active{background:var(--main);color:white;border-color:var(--main)}
+
+.cabin-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.cabin-tag{
+  padding:6px 10px;border-radius:99px;border:1px solid var(--line);background:#fafafa;
+  font-size:12px;color:var(--text-2)
+}
+
+.passenger-input{margin-top:12px}
+.passenger-input input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);margin:6px 0;font-size:14px}
+.pay-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--accent);color:#002147;font-weight:700;font-size:16px;cursor:pointer;margin-top:10px}
+
+/* 电子登机牌 */
+.boarding-card{
+  border:2px dashed var(--main);border-radius:16px;padding:20px;margin:10px;background:#fff;
+}
+.boarding-card h3{text-align:center;color:var(--main);margin-bottom:16px}
+.boarding-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.boarding-line:last-child{border-bottom:none}
+.boarding-line span:first-child{color:var(--text-2)}
+.boarding-line span:last-child{font-weight:bold}
+.qr-area{text-align:center;margin-top:16px;font-size:60px;color:var(--main)}
+
+/* 商城卡片 */
+.goods-card{
+  border:1px solid var(--line);
+  border-radius:12px;padding:12px;margin:8px;
+}
+.model-card{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px;
+}
+.model-title{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.model-title h4{font-size:15px;color:var(--main)}
+.model-title .plane-icon{
+  width:36px;height:36px;border-radius:10px;background:#eef4fb;color:var(--main);
+  display:flex;align-items:center;justify-content:center;font-size:18px
+}
+.model-desc{color:var(--text-2);font-size:13px;line-height:1.6}
+.model-specs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.model-spec{
+  padding:6px 10px;border-radius:99px;background:#fafafa;border:1px solid var(--line);
+  font-size:12px;color:var(--text-2)
+}
+.model-layout{
+  margin-top:12px;padding:12px;border-radius:10px;background:#fafafa;border:1px dashed var(--line);
+  font-size:12px;color:var(--text-2);line-height:1.7
+}
+</style>
+</head>
+<body>
+<div class="splash">
+  <div class="splash-logo"><i class="fa fa-plane" style="font-size:32px;color:#fff"></i></div>
+  <h1>耀星航空</h1>
+  <p>YAOXING AIRLINES</p>
+  <div class="bar"><i></i></div>
+</div>
+
+<div class="guide-wrap">
+  <div class="guide">
+    <div class="guide-page">
+      <i class="fa fa-plane"></i>
+      <h3>欢迎使用耀星航空</h3>
+      <p>在线预订国际/国内航班，办理值机，了解机型与商城服务</p>
+    </div>
+    <div class="guide-page">
+      <i class="fa fa-ticket"></i>
+      <h3>便捷出行</h3>
+      <p>选择舱位并付款后解锁座位，获取电子登机牌</p>
+    </div>
+    <div class="guide-page">
+      <i class="fa fa-cube"></i>
+      <h3>机型档案</h3>
+      <p>查看A380、B747、B787、湾流等机型布局与特点</p>
+    </div>
+  </div>
+  <div class="guide-dots">
+    <span class="active"></span>
+    <span></span>
+    <span></span>
+  </div>
+  <button class="guide-btn">开始使用</button>
+  <div class="guide-skip">跳过</div>
+</div>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>耀星航空</div>
+    <div class="right"><i class="fa fa-bell"></i><i class="fa fa-user"></i></div>
+  </div>
+  <div class="header">
+    <div class="header-row">
+      <button class="back-btn"><i class="fa fa-angle-left"></i></button>
+      <div class="header-title"></div>
+      <div class="header-placeholder"></div>
+    </div>
+  </div>
+  <div class="scroll">
+    <!-- 首页 -->
+    <div class="page active" id="page-home">
+      <div class="home-banner">
+        <h2>出发，飞向世界</h2>
+        <p>耀星航空 · 机型覆盖宽体客机、双层客机与高端公务机</p>
+        <button id="goBook">立即订票</button>
+      </div>
+      <div class="quick-grid">
+        <div class="quick-item" data-page="flight">
+          <i class="fa fa-plane"></i>
+          <span>机票预订</span>
+        </div>
+        <div class="quick-item" data-page="checkin">
+          <i class="fa fa-id-card"></i>
+          <span>在线值机</span>
+        </div>
+        <div class="quick-item" data-page="mall">
+          <i class="fa fa-shopping-bag"></i>
+          <span>商城</span>
+        </div>
+        <div class="quick-item" data-page="model">
+          <i class="fa fa-cube"></i>
+          <span>机型档案</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 机票预订页 -->
+    <div class="page" id="page-flight">
+      <div class="flight-tab">
+        <button class="active" data-type="domestic">国内</button>
+        <button data-type="intl">国际</button>
+      </div>
+      <div class="select-city-row">
+        <button id="btnDepCity">出发城市：昆明</button>
+        <button class="swap-city" id="swapCity"><i class="fa fa-exchange"></i></button>
+        <button id="btnArrCity">到达城市：请选择</button>
+      </div>
+      <div class="date-box">
+        <label style="font-size:13px;color:var(--text-2)">出发日期</label>
+        <input type="date" id="flightDate">
+      </div>
+      <div class="city-select-box">
+        <h4 id="citySelectTitle">选择到达城市</h4>
+        <div class="city-grid" id="cityGrid"></div>
+      </div>
+      <div class="query-btn-wrap">
+        <button id="doSearchFlight">查询航班</button>
+      </div>
+      <div id="flightResult"></div>
+    </div>
+
+    <!-- 在线值机页 -->
+    <div class="page" id="page-checkin">
+      <div class="card">
+        <div class="row">
+          <div>订单号</div>
+          <input style="padding:8px;border-radius:8px;border:1px solid #ddd;width:60%" type="text" id="chkOrder" placeholder="输入订单号">
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div>乘客姓名</div>
+          <input style="padding:8px;border-radius:8px;border:1px solid #ddd;width:60%" type="text" id="chkName" placeholder="填写姓名">
+        </div>
+        <button style="width:100%;margin-top:16px;padding:12px;border:none;border-radius:12px;background:#002147;color:white;cursor:pointer" onclick="showBoarding()">办理值机</button>
+      </div>
+    </div>
+
+    <!-- 商城页 -->
+    <div class="page" id="page-mall">
+      <div class="goods-card">
+        <div class="row">
+          <div>巴黎旅行套餐</div>
+          <div class="flight-price">¥4999</div>
+        </div>
+        <p class="muted">机场接送+景点门票</p>
+        <button class="book-btn" style="margin-top:10px">选购</button>
+      </div>
+      <div class="goods-card">
+        <div class="row">
+          <div>伦敦城市通票</div>
+          <div class="flight-price">¥3680</div>
+        </div>
+        <p class="muted">景点通票+交通卡</p>
+        <button class="book-btn" style="margin-top:10px">选购</button>
+      </div>
+      <div class="goods-card">
+        <div class="row">
+          <div>机上降噪耳机</div>
+          <div class="flight-price">¥299</div>
+        </div>
+        <p class="muted">航班机上领取</p>
+        <button class="book-btn" style="margin-top:10px">选购</button>
+      </div>
+      <div class="goods-card">
+        <div class="row">
+          <div>耀星航空纪念模型</div>
+          <div class="flight-price">¥168</div>
+        </div>
+        <p class="muted">A380 / B747 / 湾流可选</p>
+        <button class="book-btn" style="margin-top:10px">选购</button>
+      </div>
+    </div>
+
+    <!-- 机型档案页 -->
+    <div class="page" id="page-model">
+      <div class="model-card">
+        <div class="model-title">
+          <div class="plane-icon"><i class="fa fa-plane"></i></div>
+          <h4>空中客车 A380</h4>
+        </div>
+        <p class="model-desc">双层宽体客机，上层全部头等舱，下层布置公务舱、超级经济舱与经济舱。</p>
+        <div class="model-specs">
+          <span class="model-spec">双层甲板</span>
+          <span class="model-spec">4舱位布局</span>
+          <span class="model-spec">远程航线</span>
+        </div>
+        <div class="model-layout">
+          <strong>布局：</strong>上层：头等舱；下层前部：公务舱；下层中部：超级经济舱；下层后部：经济舱。
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">
+          <div class="plane-icon"><i class="fa fa-plane"></i></div>
+          <h4>波音 747-8</h4>
+        </div>
+        <p class="model-desc">经典“驼峰”客机，上层驼峰区域为公务舱，下层主甲板布置头等舱、超级经济舱与经济舱。</p>
+        <div class="model-specs">
+          <span class="model-spec">驼峰双层</span>
+          <span class="model-spec">4舱位布局</span>
+          <span class="model-spec">洲际航线</span>
+        </div>
+        <div class="model-layout">
+          <strong>布局：</strong>上层驼峰：公务舱；下层前部：头等舱；下层中部：超级经济舱；下层后部：经济舱。
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">
+          <div class="plane-icon"><i class="fa fa-plane"></i></div>
+          <h4>波音 787-9</h4>
+        </div>
+        <p class="model-desc">现代宽体梦想客机，舒适性与燃油效率均衡，适合中远程国际航线。</p>
+        <div class="model-specs">
+          <span class="model-spec">宽体机</span>
+          <span class="model-spec">3-3-3经济舱</span>
+          <span class="model-spec">远程航线</span>
+        </div>
+        <div class="model-layout">
+          <strong>布局：</strong>前部：头等舱；中前部：公务舱；中部：超级经济舱；后部：经济舱。
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">
+          <div class="plane-icon"><i class="fa fa-plane"></i></div>
+          <h4>湾流 G650</h4>
+        </div>
+        <p class="model-desc">高端远程公务机，座位少、空间私密，适合高净值商务出行。</p>
+        <div class="model-specs">
+          <span class="model-spec">公务机</span>
+          <span class="model-spec">1-1豪华布局</span>
+          <span class="model-spec">高端航线</span>
+        </div>
+        <div class="model-layout">
+          <strong>布局：</strong>全舱按1-1豪华公务舱布置，座位数量少，支持平躺与私密隔间。
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">
+          <div class="plane-icon"><i class="fa fa-plane"></i></div>
+          <h4>湾流 G700</h4>
+        </div>
+        <p class="model-desc">湾流最新一代公务机，客舱空间更大，定位顶级商务与定制化出行。</p>
+        <div class="model-specs">
+          <span class="model-spec">公务机</span>
+          <span class="model-spec">1-1豪华头等公务</span>
+          <span class="model-spec">顶级航线</span>
+        </div>
+        <div class="model-layout">
+          <strong>布局：</strong>采用1-1豪华头等/公务混合布局，重点强化平躺座位、私密区与机上服务。
+        </div>
+      </div>
+    </div>
+
+    <!--航班动态页-->
+    <div class="page" id="page-status">
+      <div class="card">
+        <input style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd" placeholder="输入航班号">
+        <button style="width:100%;margin-top:16px;padding:12px;border:none;border-radius:12px;background:#002147;color:white;cursor:pointer">查询</button>
+      </div>
+    </div>
+  </div>
+  <div class="tabbar show">
+    <button class="tab active" data-page="home">
+      <i class="fa fa-home"></i>
+      <span>首页</span>
+    </button>
+    <button class="tab" data-page="flight">
+      <i class="fa fa-ticket"></i>
+      <span>预订</span>
+    </button>
+    <button class="tab" data-page="checkin">
+      <i class="fa fa-id-card"></i>
+      <span>值机</span>
+    </button>
+    <button class="tab" data-page="mall">
+      <i class="fa fa-shopping-bag"></i>
+      <span>商城</span>
+    </button>
+  </div>
+</div>
+
+<!-- 弹窗：舱位选择 -->
+<div class="mask" id="cabinMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>选择舱位</h3>
+      <button class="modal-close" onclick="closeCabinMask()">×</button>
+    </div>
+    <div class="modal-body" id="cabinModalBody"></div>
+    <div class="modal-footer">
+      <button class="cancel" onclick="closeCabinMask()">取消</button>
+      <button class="next" onclick="goPassengerPay()">下一步：填写乘客并支付</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗：乘客信息 & 支付 -->
+<div class="mask" id="payMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>乘客信息 & 支付</h3>
+      <button class="modal-close" onclick="closePayMask()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="passenger-input">
+        <input type="text" id="pName" placeholder="乘客姓名">
+        <input type="text" id="pId" placeholder="身份证号">
+      </div>
+      <div class="flight-price" id="totalPrice"></div>
+      <button class="pay-btn" onclick="paySuccess()">确认付款</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗：选座 -->
+<div class="mask" id="seatMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>选择座位</h3>
+      <button class="modal-close" onclick="closeSeatMask()">×</button>
+    </div>
+    <div class="modal-body" id="seatModalBody"></div>
+    <div class="modal-footer">
+      <button class="cancel" onclick="closeSeatMask()">取消</button>
+      <button class="next" onclick="confirmSeat()">确认座位</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗：电子登机牌 -->
+<div class="mask" id="boardingMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>电子登机牌</h3>
+      <button class="modal-close" onclick="closeBoardingMask()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="boarding-card">
+        <h3>耀星航空 电子登机牌</h3>
+        <div class="boarding-line"><span>航班号</span><span id="bdNo"></span></div>
+        <div class="boarding-line"><span>出发</span><span id="bdDep"></span></div>
+        <div class="boarding-line"><span>到达</span><span id="bdArr"></span></div>
+        <div class="boarding-line"><span>乘客</span><span id="bdName"></span></div>
+        <div class="boarding-line"><span>座位号</span><span id="bdSeat"></span></div>
+        <div class="boarding-line"><span>舱位</span><span id="bdCabin"></span></div>
+        <div class="boarding-line"><span>登机口</span><span id="bdGate"></span></div>
+        <div class="boarding-line"><span>登机时间</span><span id="bdTime"></span></div>
+        <div class="boarding-line"><span>状态</span><span style="color:var(--success)">已值机</span></div>
+        <div class="qr-area"><i class="fa fa-qrcode"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const flightDB = {
+  domestic:[
+    {name:"昆明",code:"KMG"},
+    {name:"重庆",code:"CKG"},
+    {name:"西安",code:"SXI"},
+    {name:"北京",code:"PEK"},
+    {name:"上海",code:"SHA"},
+    {name:"广州",code:"CAN"}
+  ],
+  intl:[
+    {name:"洛杉矶",code:"LAX"},
+    {name:"纽约",code:"JFK"},
+    {name:"伦敦",code:"LHR"},
+    {name:"巴黎",code:"CDG"},
+    {name:"悉尼",code:"SYD"},
+    {name:"迪拜",code:"DXB"},
+    {name:"曼谷",code:"BKK"},
+    {name:"新加坡",code:"SIN"},
+    {name:"东京",code:"NRT"}
+  ]
+}
+
+const routeDB = [
+  {dep:"KMG",arr:"CKG",no:"YX102",depTime:"07:20",arrTime:"09:00",duration:"1小时40分",stop:"无经停",plane:"B737",eco:820,seco:1200,biz:2600,first:0},
+  {dep:"KMG",arr:"SXI",no:"YX202",depTime:"07:40",arrTime:"10:10",duration:"2小时30分",stop:"无经停",plane:"B777",eco:950,seco:1350,biz:2900,first:6200},
+  {dep:"KMG",arr:"PEK",no:"YX302",depTime:"08:00",arrTime:"11:40",duration:"3小时40分",stop:"无经停",plane:"B787",eco:1280,seco:1700,biz:3600,first:7500},
+  {dep:"KMG",arr:"SHA",no:"YX402",depTime:"07:30",arrTime:"10:40",duration:"3小时10分",stop:"无经停",plane:"A350",eco:1150,seco:1550,biz:3200,first:6800},
+  {dep:"KMG",arr:"CAN",no:"YX502",depTime:"07:50",arrTime:"10:00",duration:"2小时10分",stop:"无经停",plane:"C919",eco:960,seco:1300,biz:2800,first:0},
+  {dep:"KMG",arr:"LAX",no:"YX7471",depTime:"08:00",arrTime:"11:20",duration:"14h20m",stop:"无经停",plane:"B747-8",eco:7100,seco:9600,biz:18900,first:33000},
+  {dep:"LAX",arr:"KMG",no:"YX7472",depTime:"10:30",arrTime:"14:50",duration:"15h20m",stop:"无经停",plane:"B747-8",eco:7300,seco:9800,biz:19300,first:33800},
+  {dep:"KMG",arr:"LAX",no:"YX602",depTime:"09:00",arrTime:"12:10",duration:"14小时10分",stop:"无经停",plane:"A380",eco:6800,seco:9200,biz:18500,first:32000},
+  {dep:"LAX",arr:"KMG",no:"YX604",depTime:"10:10",arrTime:"14:05",duration:"15小时05分",stop:"无经停",plane:"A380",eco:6900,seco:9400,biz:18800,first:32800},
+  {dep:"KMG",arr:"JFK",no:"YX802",depTime:"08:30",arrTime:"19:20",duration:"15小时20分",stop:"无经停",plane:"B777",eco:6200,seco:8600,biz:17600,first:29000},
+  {dep:"KMG",arr:"NRT",no:"YX902",depTime:"08:50",arrTime:"13:30",duration:"5小时40分",stop:"无经停",plane:"B787",eco:3600,seco:4800,biz:9600,first:18000},
+  {dep:"KMG",arr:"SIN",no:"YX1002",depTime:"08:20",arrTime:"12:40",duration:"4小时20分",stop:"无经停",plane:"A350",eco:2600,seco:3600,biz:7200,first:14000},
+  {dep:"KMG",arr:"DXB",no:"YX2001",depTime:"09:30",arrTime:"13:50",duration:"6小时20分",stop:"无经停",plane:"B787",eco:4300,seco:5800,biz:12000,first:22000},
+  {dep:"DXB",arr:"KMG",no:"YX2002",depTime:"10:40",arrTime:"15:10",duration:"6小时30分",stop:"无经停",plane:"B787",eco:4450,seco:5980,biz:12400,first:22800},
+  {dep:"KMG",arr:"CDG",no:"YX3001",depTime:"12:20",arrTime:"18:40",duration:"13小时20分",stop:"无经停",plane:"A350",eco:5600,seco:7600,biz:15800,first:28000},
+  {dep:"CDG",arr:"KMG",no:"YX3002",depTime:"13:50",arrTime:"20:10",duration:"13小时20分",stop:"无经停",plane:"A350",eco:5750,seco:7780,biz:16200,first:28600},
+  {dep:"KMG",arr:"LHR",no:"YX4001",depTime:"14:00",arrTime:"20:30",duration:"13小时30分",stop:"无经停",plane:"B777",eco:5400,seco:7300,biz:15200,first:27000},
+  {dep:"LHR",arr:"KMG",no:"YX4002",depTime:"15:20",arrTime:"21:50",duration:"13小时30分",stop:"无经停",plane:"B777",eco:5550,seco:7480,biz:15600,first:27600},
+  {dep:"KMG",arr:"SYD",no:"YX5001",depTime:"20:40",arrTime:"08:20+1",duration:"9小时40分",stop:"无经停",plane:"B787",eco:4200,seco:5700,biz:11800,first:21000},
+  {dep:"SYD",arr:"KMG",no:"YX5002",depTime:"09:10",arrTime:"15:40",duration:"9小时30分",stop:"无经停",plane:"B787",eco:4350,seco:5880,biz:12200,first:21600},
+  {dep:"KMG",arr:"BKK",no:"YX6001",depTime:"15:20",arrTime:"16:35",duration:"2小时15分",stop:"无经停",plane:"B737",eco:1680,seco:2300,biz:4800,first:0},
+  {dep:"BKK",arr:"KMG",no:"YX6002",depTime:"17:10",arrTime:"19:40",duration:"2小时30分",stop:"无经停",plane:"B737",eco:1780,seco:2420,biz:5050,first:0},
+  {dep:"KMG",arr:"NRT",no:"YX7001",depTime:"08:50",arrTime:"13:30",duration:"5小时40分",stop:"无经停",plane:"A350",eco:3800,seco:5100,biz:10200,first:19000},
+  {dep:"NRT",arr:"KMG",no:"YX7002",depTime:"14:20",arrTime:"19:50",duration:"6小时30分",stop:"无经停",plane:"A350",eco:3950,seco:5280,biz:10600,first:19600},
+  {dep:"KMG",arr:"LHR",no:"YXG6501",depTime:"10:00",arrTime:"18:30",duration:"14小时30分",stop:"公务包机",plane:"G650",eco:0,seco:0,biz:0,first:42000},
+  {dep:"LHR",arr:"KMG",no:"YXG6502",depTime:"11:30",arrTime:"20:00",duration:"14小时30分",stop:"公务包机",plane:"G650",eco:0,seco:0,biz:0,first:43200},
+  {dep:"KMG",arr:"DXB",no:"YXG7001",depTime:"09:00",arrTime:"12:40",duration:"5小时40分",stop:"公务包机",plane:"G700",eco:0,seco:0,biz:0,first:28000},
+  {dep:"DXB",arr:"KMG",no:"YXG7002",depTime:"10:20",arrTime:"14:00",duration:"5小时40分",stop:"公务包机",plane:"G700",eco:0,seco:0,biz:0,first:28900}
+]
+
+const planeConfig = {
+  "B737":{name:"波音737",layout:"3-3",hasFirst:false,rows:{first:0,biz:4,seco:6,eco:14}},
+  "C919":{name:"C919国产大飞机",layout:"3-3",hasFirst:false,rows:{first:0,biz:4,seco:6,eco:14}},
+  "B777":{name:"波音777",layout:"3-3-3",hasFirst:true,rows:{first:5,biz:7,seco:7,eco:16}},
+  "B787":{name:"波音787梦想客机",layout:"3-3-3",hasFirst:true,rows:{first:5,biz:7,seco:7,eco:16}},
+  "A350":{name:"空客A350",layout:"3-3-3",hasFirst:true,rows:{first:5,biz:7,seco:7,eco:16}},
+  "A380":{name:"空客A380双层",layout:"双层",hasFirst:true,rows:{first:6,biz:8,seco:8,eco:22}},
+  "B747-8":{name:"波音747-8（驼峰双层）",layout:"驼峰双层",hasFirst:true,rows:{first:5,biz:7,seco:7,eco:20}},
+  "G650":{name:"湾流 G650",layout:"1-1豪华公务",hasFirst:true,rows:{first:0,biz:0,seco:0,eco:0}},
+  "G700":{name:"湾流 G700",layout:"1-1豪华头等公务",hasFirst:true,rows:{first:0,biz:0,seco:0,eco:0}}
+}
+
+const allPages = document.querySelectorAll('.page');
+const quickItems = document.querySelectorAll('.quick-item');
+const tabs = document.querySelectorAll('.tab');
+function switchPage(pageId){
+  allPages.forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  tabs.forEach(t=>t.classList.remove('active'));
+  tabs.forEach(t=>{if(t.dataset.page === pageId) t.classList.add('active');})
+}
+quickItems.forEach(item=>{item.addEventListener('click',()=>{switchPage(item.dataset.page);})})
+tabs.forEach(tab=>{tab.addEventListener('click',()=>{switchPage(tab.dataset.page);})})
+document.getElementById('goBook').onclick = ()=>switchPage('flight');
+
+const flightTypeBtns = document.querySelectorAll('.flight-tab button');
+const cityGridBox = document.getElementById('cityGrid');
+const flightResultBox = document.getElementById('flightResult');
+let currentFlightType = 'domestic';
+let selectMode = "arr";
+let depCity = {name:"昆明",code:"KMG"};
+let arrCity = null;
+let selectedFlight = null;
+let selectedCabin = null;
+let selectedSeat = "";
+let payFinished = false;
+
+flightTypeBtns.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    flightTypeBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFlightType = btn.dataset.type;
+    arrCity = null;
+    flightResultBox.innerHTML = "";
+    renderCityCard();
+  })
+})
+
+const btnDepCity = document.getElementById("btnDepCity");
+const btnArrCity = document.getElementById("btnArrCity");
+const citySelectTitle = document.getElementById("citySelectTitle");
+btnDepCity.onclick = function(){selectMode = "dep";citySelectTitle.innerText = "选择出发城市";renderCityCard();}
+btnArrCity.onclick = function(){selectMode = "arr";citySelectTitle.innerText = "选择到达城市";renderCityCard();}
+document.getElementById("swapCity").onclick = function(){const temp = depCity;depCity = arrCity;arrCity = temp;refreshCityBtn();flightResultBox.innerHTML="";}
+function refreshCityBtn(){
+  btnDepCity.innerText = "出发城市："+(depCity?.name||"请选择");
+  btnArrCity.innerText = "到达城市："+(arrCity?.name||"请选择");
+}
+
+function renderCityCard(){
+  cityGridBox.innerHTML = "";
+  const list = flightDB[currentFlightType];
+  list.forEach(city=>{
+    const card = document.createElement('div');
+    card.className = "city-card";
+    card.innerHTML = `<div class="name">${city.name}</div>`;
+    card.onclick = ()=>{
+      document.querySelectorAll('.city-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      if(selectMode === "dep") depCity = city; else arrCity = city;
+      refreshCityBtn();
+      flightResultBox.innerHTML = "";
+    }
+    cityGridBox.appendChild(card);
+  })
+}
+
+document.getElementById("doSearchFlight").onclick = function(){
+  if(!depCity || !arrCity){flightResultBox.innerHTML = `<div class="section-title">请先选择出发和到达城市</div>`;return;}
+  const matchRoutes = routeDB.filter(r=>r.dep === depCity.code && r.arr === arrCity.code);
+  if(matchRoutes.length ===0){flightResultBox.innerHTML = `<div class="section-title">暂无匹配航班</div>`;return;}
+  let html = `<div class="section-title">${depCity.name} → ${arrCity.name} 航班列表（点击航班选择舱位）</div><div class="flight-list">`;
+  matchRoutes.forEach(route=>{
+    const isGulfstream = route.plane === "G650" || route.plane === "G700";
+    const cabinText = isGulfstream
+      ? `仅豪华头等舱 ¥${route.first}`
+      : (route.first>0?`经济舱 ¥${route.eco}｜超经 ¥${route.seco}｜公务 ¥${route.biz}｜头等 ¥${route.first}`:`经济舱 ¥${route.eco}｜超经 ¥${route.seco}｜公务 ¥${route.biz}`);
+    html += `
+    <div class="flight-row-item" onclick="openCabinPanel('${route.no}')">
+      <div class="flight-left">
+        <div class="flight-airline"><span class="flight-logo">耀</span>耀星航空 <span class="plane-tag ${isGulfstream?'gulfstream':''}">${route.plane}</span></div>
+        <div class="flight-time">${route.depTime}</div>
+        <div class="flight-city">${depCity.name} ${depCity.code}</div>
+      </div>
+      <div class="flight-middle">
+        <div class="flight-duration">${route.duration}</div>
+        <div class="flight-line"></div>
+        <div class="flight-plane">${route.stop}</div>
+      </div>
+      <div class="flight-right">
+        <div class="flight-time">${route.arrTime}</div>
+        <div class="flight-city">${arrCity.name} ${arrCity.code}</div>
+      </div>
+      <div class="flight-price-area">
+        <div>¥${isGulfstream?route.first:route.eco}起</div>
+        <div style="font-size:11px;color:var(--text-3);font-weight:normal">${cabinText}</div>
+      </div>
+    </div>`;
+  })
+  html += `</div>`;
+  flightResultBox.innerHTML = html;
+}
+
+function openCabinPanel(flightNo){
+  selectedFlight = routeDB.find(r=>r.no === flightNo);
+  const cabinModalBody = document.getElementById("cabinModalBody");
+  const planeInfo = planeConfig[selectedFlight.plane];
+  const isGulfstream = selectedFlight.plane === "G650" || selectedFlight.plane === "G700";
+
+  let html = `<div class="seat-wrap"><div class="seat-title">机型：${selectedFlight.plane} ${planeInfo.name}</div>
+  <div class="seat-title" style="font-size:13px;color:var(--text-3)">${depCity.name} ${depCity.code} → ${arrCity.name} ${arrCity.code}</div>
+  <div class="cabin-select-group">`;
+
+  if(isGulfstream){
+    html += `<button onclick="selectCabin('first')">豪华头等舱 ¥${selectedFlight.first}</button>`;
+  }else{
+    html += `<button onclick="selectCabin('eco')">经济舱 ¥${selectedFlight.eco}</button>
+    <button onclick="selectCabin('seco')">超级经济舱 ¥${selectedFlight.seco}</button>
+    <button onclick="selectCabin('biz')">公务舱 ¥${selectedFlight.biz}</button>`;
+    if(selectedFlight.first>0) html += `<button onclick="selectCabin('first')">头等舱 ¥${selectedFlight.first}</button>`;
+  }
+
+  html += `</div>
+  <div class="cabin-tags">
+    <span class="cabin-tag">选舱后付款解锁座位</span>
+    <span class="cabin-tag">当前机型：${planeInfo.layout}</span>
+  </div>
+  <div class="seat-title" style="font-size:13px;color:var(--text-3)">${isGulfstream?'湾流机型采用1-1豪华头等布局':'付款成功后，可点击白色座位选座'}</div></div>`;
+
+  cabinModalBody.innerHTML = html;
+  document.getElementById("cabinMask").classList.add("show");
+  selectedCabin = null; payFinished = false;
+}
+
+function selectCabin(cabinType){
+  selectedCabin = cabinType;
+  document.querySelectorAll(".cabin-select-group button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+function renderSeatLayout(planeCode, cabinType){
+  const cfg = planeConfig[planeCode];
+  const soldSeats = ["1A","2B","3C","5A","7F","9C","12D","15B"];
+  let html = `<div class="seat-plane">`;
+
+  if(planeCode === "A380"){
+    html += `<div class="double-deck">`;
+    html += `<div class="deck-label">上层甲板 · 全部头等舱</div>`;
+    if(cabinType === "first"){
+      html += `<div class="seat-title">当前舱位：头等舱 · 上层可选</div>`;
+      html += renderBlock(cfg.rows.first,"2-2",soldSeats,"first");
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-2",soldSeats,"locked");
+    }else{
+      html += `<div class="seat-title">上层仅开放头等舱</div>`;
+      html += renderBlock(cfg.rows.first,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-2",soldSeats,"locked");
+    }
+
+    html += `<div class="deck-label">下层甲板</div>`;
+    if(cabinType === "biz"){
+      html += `<div class="seat-title">当前舱位：公务舱 · 下层前部可选</div>`;
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"biz");
+      html += renderBlock(cfg.rows.seco,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"locked");
+    }else if(cabinType === "seco"){
+      html += `<div class="seat-title">当前舱位：超级经济舱 · 下层中部可选</div>`;
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-2",soldSeats,"seco");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"locked");
+    }else if(cabinType === "eco"){
+      html += `<div class="seat-title">当前舱位：经济舱 · 下层后部可选</div>`;
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"eco");
+    }else{
+      html += `<div class="seat-title">下层不可选</div>`;
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"locked");
+    }
+    html += `</div>`;
+  }else if(planeCode === "B747-8"){
+    html += `<div class="double-deck">`;
+    html += `<div class="deck-label">上层驼峰甲板</div>`;
+    if(cabinType === "biz"){
+      html += `<div class="seat-title">公务舱 · 驼峰上层可选</div>`;
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"biz");
+      html += renderBlock(cfg.rows.first,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-4-2",soldSeats,"locked");
+    }else{
+      html += `<div class="seat-title">驼峰上层：仅头等舱可用</div>`;
+      html += renderBlock(cfg.rows.biz,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.first,"2-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-4-2",soldSeats,"locked");
+    }
+
+    html += `<div class="deck-label">下层主甲板</div>`;
+    if(cabinType === "first"){
+      html += `<div class="seat-title">头等舱· 下层前区可选</div>`;
+      html += renderBlock(cfg.rows.first,"1-2-1",soldSeats,"first");
+      html += renderBlock(cfg.rows.seco,"2-4-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"locked");
+    }else if(cabinType === "seco"){
+      html += `<div class="seat-title">超级经济舱 · 下层中区可选</div>`;
+      html += renderBlock(cfg.rows.first,"1-2-1",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-4-2",soldSeats,"seco");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"locked");
+    }else if(cabinType === "eco"){
+      html += `<div class="seat-title">经济舱 · 下层后区可选</div>`;
+      html += renderBlock(cfg.rows.first,"1-2-1",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-4-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"eco");
+    }else{
+      html += `<div class="seat-title">下层不可选</div>`;
+      html += renderBlock(cfg.rows.first,"1-2-1",soldSeats,"locked");
+      html += renderBlock(cfg.rows.seco,"2-4-2",soldSeats,"locked");
+      html += renderBlock(cfg.rows.eco,"3-4-3",soldSeats,"locked");
+    }
+    html += `</div>`;
+  }else if(planeCode === "G650" || planeCode === "G700"){
+    html += `<div class="seat-title">${planeCode} 豪华头等舱</div>`;
+    html += `<div class="seat-title" style="font-size:13px;color:var(--text-3)">1-1豪华布局，座位已解锁</div>`;
+    html += `<div class="seat-block">`;
+    for(let r=1;r<=6;r++){
+      html += `<div class="seat-row">
+        <div class="seat ${payFinished?'selected':'locked'}" onclick="pickSeat('${r}A',false,'first')">${r}A</div>
+        <div class="aisle"></div>
+        <div class="seat ${payFinished?'':'locked'}" onclick="pickSeat('${r}B',false,'first')">${r}B</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }else if(planeCode === "B737" || planeCode === "C919"){
+    html += `<div class="seat-title">窄体机 ${cfg.layout}</div>`;
+    html += renderBlock(cfg.rows.biz,"3-3",soldSeats,cabinType==='biz'?'biz':'locked');
+    html += renderBlock(cfg.rows.seco,"3-3",soldSeats,cabinType==='seco'?'seco':'locked');
+    html += renderBlock(cfg.rows.eco,"3-3",soldSeats,cabinType==='eco'?'eco':'locked');
+  }else{
+    html += `<div class="seat-title">宽体机 ${cfg.layout}</div>`;
+    if(cfg.hasFirst) html += renderBlock(cfg.rows.first,"3-3-3",soldSeats,cabinType==='first'?'first':'locked');
+    html += renderBlock(cfg.rows.biz,"3-3-3",soldSeats,cabinType==='biz'?'biz':'locked');
+    html += renderBlock(cfg.rows.seco,"3-3-3",soldSeats,cabinType==='seco'?'seco':'locked');
+    html += renderBlock(cfg.rows.eco,"3-3-3",soldSeats,cabinType==='eco'?'eco':'locked');
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function renderBlock(rowCount, layout, soldSeats, blockCabin){
+  let html = `<div class="seat-block">`;
+  const seatMap = {
+    "1-2-1":["A","C","D","K"],
+    "2-2":["A","B","E","F"],
+    "3-3":["A","B","C","D","E","F"],
+    "3-3-3":["A","B","C","D","E","F","G","H","I"],
+    "2-4-2":["A","B","C","D","E","F","G","H","J","K"],
+    "3-4-3":["A","B","C","D","E","F","G","H","I","J","K"]
+  }
+  const letters = seatMap[layout];
+  for(let r=1;r<=rowCount;r++){
+    html += `<div class="seat-row"><span class="row-number">${r}</span>`;
+    for(let idx=0;idx<letters.length;idx++){
+      const seatId = r+letters[idx];
+      const isSold = soldSeats.includes(seatId);
+      let seatClass = "";
+      if(isSold) seatClass = "sold";
+      else if(blockCabin !== selectedCabin || !payFinished) seatClass = "locked";
+      html += `<div class="seat ${seatClass}" onclick="pickSeat('${seatId}',${isSold},'${blockCabin}')">${seatId}</div>`;
+      if(layout === "3-3-3" && idx===2) html += `<div class="aisle"></div>`;
+      if(layout === "3-4-3" && idx===2) html += `<div class="aisle"></div>`;
+      if(layout === "3-4-3" && idx===6) html += `<div class="aisle"></div>`;
+      if(layout === "2-4-2" && idx===2) html += `<div class="aisle"></div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function pickSeat(seatId,isSold,blockCabin){
+  if(isSold || blockCabin !== selectedCabin || !payFinished) return;
+  document.querySelectorAll('.seat').forEach(s=>s.classList.remove('selected'));
+  event.target.classList.add('selected');
+  selectedSeat = seatId;
+}
+
+function closeCabinMask(){document.getElementById("cabinMask").classList.remove("show");}
+function goPassengerPay(){
+  if(!selectedCabin){alert("请选择舱位！");return;}
+  closeCabinMask();
+  const priceMap = {eco:selectedFlight.eco,seco:selectedFlight.seco,biz:selectedFlight.biz,first:selectedFlight.first};
+  document.getElementById("totalPrice").innerText = "订单总价：¥"+priceMap[selectedCabin];
+  document.getElementById("payMask").classList.add("show");
+}
+function closePayMask(){document.getElementById("payMask").classList.remove("show");}
+function paySuccess(){
+  const name = document.getElementById("pName").value;
+  if(!name){alert("填写乘客姓名");return;}
+  closePayMask();
+  payFinished = true;
+  openSeatPanel();
+}
+function openSeatPanel(){
+  const seatModalBody = document.getElementById("seatModalBody");
+  let html = `<div class="seat-wrap"><div class="seat-title">机型：${selectedFlight.plane} | 舱位：${selectedCabin}</div>${renderSeatLayout(selectedFlight.plane, selectedCabin)}
+  <div class="seat-title" style="font-size:13px;color:var(--text-3)">灰色座位不可选；白色座位可点击选择</div></div>`;
+  seatModalBody.innerHTML = html;
+  document.getElementById("seatMask").classList.add("show");
+}
+function closeSeatMask(){document.getElementById("seatMask").classList.remove("show");}
+function confirmSeat(){
+  if(!selectedSeat){alert("请选择座位！");return;}
+  closeSeatMask();
+  document.getElementById("bdNo").innerText = selectedFlight.no;
+  document.getElementById("bdDep").innerText = depCity.name;
+  document.getElementById("bdArr").innerText = arrCity.name;
+  document.getElementById("bdName").innerText = document.getElementById("pName").value;
+  document.getElementById("bdSeat").innerText = selectedSeat;
+  const cabinMap = {eco:"经济舱",seco:"超级经济舱",biz:"公务舱",first:"头等舱"};
+  document.getElementById("bdCabin").innerText = cabinMap[selectedCabin];
+  document.getElementById("bdGate").innerText = "G"+Math.floor(Math.random()*20+1);
+  document.getElementById("bdTime").innerText = "07:"+String(Math.floor(Math.random()*40+10)).padStart(2,"0");
+  document.getElementById("boardingMask").classList.add("show");
+}
+function closeBoardingMask(){document.getElementById("boardingMask").classList.remove("show");}
+function showBoarding(){
+  document.getElementById("bdNo").innerText = "YX102";
+  document.getElementById("bdDep").innerText = "昆明";
+  document.getElementById("bdArr").innerText = "重庆";
+  document.getElementById("bdName").innerText = "测试乘客";
+  document.getElementById("bdSeat").innerText = "12A";
+  document.getElementById("bdCabin").innerText = "经济舱";
+  document.getElementById("bdGate").innerText = "G12";
+  document.getElementById("bdTime").innerText = "07:40";
+  document.getElementById("boardingMask").classList.add("show");
+}
+
+const splash = document.querySelector('.splash');
+const guideWrap = document.querySelector('.guide-wrap');
+const app = document.querySelector('.app');
+const guidePages = document.querySelectorAll('.guide-page');
+const guideDots = document.querySelectorAll('.guide-dots span');
+const guideBtn = document.querySelector('.guide-btn');
+const skipBtn = document.querySelector('.guide-skip');
+let guideIndex = 0;
+
+setTimeout(()=>{
+  splash.classList.add('hide');
+  setTimeout(()=>{guideWrap.classList.add('show');},100)
+},400)
+
+guidePages.forEach((page,idx)=>{
+  page.addEventListener('click',()=>{
+    guideIndex++;
+    if(guideIndex >= guidePages.length){guideWrap.classList.remove('show');app.classList.add('show');return;}
+    document.querySelector('.guide').style.transform = `translateX(-${guideIndex*100}vw)`;
+    guideDots.forEach(d=>d.classList.remove('active'));
+    guideDots[guideIndex].classList.add('active');
+    if(guideIndex === guidePages.length-1) guideBtn.classList.add('show');
+  })
+})
+guideBtn.addEventListener('click',()=>{guideWrap.classList.remove('show');app.classList.add('show');})
+skipBtn.addEventListener('click',()=>{guideWrap.classList.remove('show');app.classList.add('show');})
+
+renderCityCard();
+refreshCityBtn();
+</script>
+</body>
+</html>
